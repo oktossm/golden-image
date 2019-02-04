@@ -6,6 +6,7 @@
     "gce_auth":    "{{env `GOOGLE_CREDENTIALS`}}",
     "gce_machine": "custom-1-1024",
     "gce_user":    "provision",
+    "gce_tags":    "ssh-wan",
     "consul_ver":  "1.4.0",
     "nomad_ver":   "0.8.6",
     "goss_ver":    "0.3.6",
@@ -36,6 +37,7 @@
       "machine_type":        "{{user `gce_machine`}}",
       "source_image_family": "{{user `gce_from`}}",
       "zone":                "{{user `gce_zone`}}",
+      "tags":                "{{user `gce_tags`}}",
       "image_name":          "{{user `to`}}",
       "image_description":   "{{user `desc`}}"
     },
