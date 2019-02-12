@@ -112,7 +112,7 @@
       "expect_disconnect": true,
       "execute_command": "echo 'packer' | sudo -S bash -c '{{ .Vars }} {{ .Path }}'",
       "environment_vars": [
-        "CONSUL_VERSION={{user `consul_ver`}}"
+        "CONSUL_VERSION={{user `consul_ver`}}",
         "NOMAD_VERSION={{user `nomad_ver`}}",
         "LEVANT_VERSION={{user `levant_ver`}}",
         "CONSUL_TEMPLATE_VERSION={{user `ct_ver`}}",
