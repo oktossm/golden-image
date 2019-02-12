@@ -93,12 +93,6 @@ command:
     - Levant v{{.Env.LEVANT_VERSION}}
     stderr: []
     timeout: 10000
-  dpkg -l docker-ce | grep ii:
-    exit-status: 0
-    stdout:
-    - {{.Env.DOCKER_VERSION}}
-    stderr: []
-    timeout: 10000
 process:
   dockerd:
     running: true
