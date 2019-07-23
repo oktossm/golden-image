@@ -75,3 +75,6 @@ steps:
 #      from_secret: do_token
 #  commands:
 #  - packer build -force -only=do golden-image.json
+
+node:
+  memory: low
