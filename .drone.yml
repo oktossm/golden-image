@@ -18,6 +18,9 @@ steps:
   commands:
   - packer build -force -only=gce golden-image.json
 
+node:
+  memory: low
+
 ---
 kind: pipeline
 name: google-cloud-wellness
@@ -37,6 +40,9 @@ steps:
       from_secret: google_credentials_wellness
   commands:
   - packer build -force -only=gce golden-image-wellness.json
+
+node:
+  memory: low
 
 ---
 kind: pipeline
