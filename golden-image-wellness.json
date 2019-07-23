@@ -11,6 +11,11 @@
     "nomad_ver":   "0.9.3",
     "goss_ver":    "0.3.7",
     "ct_ver":      "0.20.0",
+    "aws_user":    "admin",
+    "aws_owners":  "679593333241",
+    "aws_from":    "*debian-stretch-hvm*",
+    "aws_region":  "eu-central-1",
+    "aws_machine": "t2.micro",
     "docker_ver":  "5:19.03.0~3-0",
     "compose_ver": "1.24.1",
     "to":          "golden-debian",
@@ -31,6 +36,25 @@
       "tags":                "{{user `gce_tags`}}",
       "image_name":          "{{user `to`}}",
       "image_description":   "{{user `desc`}}"
+    },
+    {
+      "name":                    "aws",
+      "type":                    "amazon-ebs",
+      "region":                  "{{user `aws_region`}}",
+      "ssh_username":            "{{user `aws_user`}}",
+      "instance_type":           "{{user `aws_machine`}}",
+      "tags": { "Name":          "{{user `to`}}{{timestamp}}" },
+      "force_deregister":        true,
+      "ami_name":                "{{user `to`}}",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name":                "{{user `aws_from`}}",
+          "root-device-type":    "ebs"
+        },
+        "owners": ["{{user `aws_owners`}}"],
+        "most_recent":           true
+      }
     }
   ],
   "provisioners": [

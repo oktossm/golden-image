@@ -18,6 +18,9 @@ steps:
   commands:
   - packer build -force -only=gce golden-image.json
 
+node:
+  memory: low
+
 ---
 kind: pipeline
 name: google-cloud-wellness
@@ -38,25 +41,28 @@ steps:
   commands:
   - packer build -force -only=gce golden-image-wellness.json
 
-#---
-#kind: pipeline
-#name: aws
+node:
+  memory: low
 
-#steps:
-#- name: check for accidentally dropped creds
-#  image: yellowmegaman/container-trufflehog:2.0.98
-#  commands:
-#  - /usr/local/bin/trufflehog --regex --entropy=False file:///$CI_WORKSPACE
-#
-#- name: build-ami
-#  image: yellowmegaman/container-packer:1.3.3
-#  environment:
-#    AWS_ACCESS_KEY:
-#      from_secret: aws_access_key
-#    AWS_SECRET_KEY:
-#      from_secret: aws_secret_key
-#  commands:
-#  - packer build -force -only=aws golden-image.json
+---
+kind: pipeline
+name: aws
+
+steps:
+- name: check for accidentally dropped creds
+  image: yellowmegaman/container-trufflehog:2.0.98
+  commands:
+  - /usr/local/bin/trufflehog --regex --entropy=False file:///$CI_WORKSPACE
+
+- name: build-ami
+  image: yellowmegaman/container-packer:1.3.3
+  environment:
+    AWS_ACCESS_KEY:
+      from_secret: aws_access_key
+    AWS_SECRET_KEY:
+      from_secret: aws_secret_key
+  commands:
+  - packer build -force -only=aws golden-image-wellness.json
 
 #---
 #kind: pipeline
