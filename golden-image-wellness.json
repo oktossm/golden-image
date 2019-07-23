@@ -1,0 +1,107 @@
+{
+  "variables": {
+    "gce_from":    "debian-9",
+    "gce_zone":    "europe-west4-c",
+    "gce_project": "{{env `GOOGLE_PROJECT`}}",
+    "gce_auth":    "{{env `GOOGLE_CREDENTIALS`}}",
+    "gce_machine": "custom-1-1024",
+    "gce_user":    "provision",
+    "levant_ver":  "0.2.7",
+    "consul_ver":  "1.5.2",
+    "nomad_ver":   "0.9.3",
+    "goss_ver":    "0.3.7",
+    "ct_ver":      "0.20.0",
+    "docker_ver":  "5:19.03.0~3-0",
+    "compose_ver": "1.24.1",
+    "to":          "golden-debian",
+    "desc":        "packer-golden-image-welness"
+  },
+  "builders": [
+    {
+      "name":                "gce",
+      "type":                "googlecompute",
+      "disk_type":           "pd-ssd",
+      "region":              "{{user `gce_zone`}}",
+      "project_id":          "{{user `gce_project`}}",
+      "account_file":        "{{user `gce_auth`}}",
+      "ssh_username":        "{{user `gce_user`}}",
+      "machine_type":        "{{user `gce_machine`}}",
+      "source_image_family": "{{user `gce_from`}}",
+      "zone":                "{{user `gce_zone`}}",
+      "tags":                "{{user `gce_tags`}}",
+      "image_name":          "{{user `to`}}",
+      "image_description":   "{{user `desc`}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "environment_vars": [
+	"DEBIAN_FRONTEND=noninteractive",
+        "CONSUL_VERSION={{user `consul_ver`}}",
+        "NOMAD_VERSION={{user `nomad_ver`}}",
+	"LEVANT_VERSION={{user `levant_ver`}}",
+        "GOSS_VERSION={{user `goss_ver`}}",
+        "CONSUL_TEMPLATE_VERSION={{user `ct_ver`}}",
+        "DOCKER_COMPOSE_VERSION={{user `compose_ver`}}",
+        "DOCKER_VERSION={{user `docker_ver`}}"
+      ],
+      "execute_command": "echo 'packer' | sudo -S bash -c '{{ .Vars }} {{ .Path }}'",
+      "scripts": [
+        "provision/{{build_name}}.sh",
+	"provision/consul.sh",
+	"provision/nomad.sh",
+	"provision/levant.sh",
+	"provision/consul-template.sh",
+	"provision/docker-compose.sh",
+	"provision/goss.sh",
+	"provision/rexray.sh"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "configuration",
+      "destination": "/tmp"
+    },
+    {
+      "type": "file",
+      "source": "configuration/rexray.yml.{{build_name}}",
+      "destination": "/tmp/configuration/config.yml"
+    },
+    {
+      "type": "shell",
+      "expect_disconnect": true,
+      "execute_command": "echo 'packer' | sudo -S bash -c '{{ .Vars }} {{ .Path }}'",
+      "environment_vars": [
+        "CONSUL_VERSION={{user `consul_ver`}}",
+        "NOMAD_VERSION={{user `nomad_ver`}}",
+        "LEVANT_VERSION={{user `levant_ver`}}",
+        "CONSUL_TEMPLATE_VERSION={{user `ct_ver`}}",
+        "DOCKER_COMPOSE_VERSION={{user `compose_ver`}}",
+        "DOCKER_VERSION={{user `docker_ver`}}"
+      ],
+      "inline": [
+        "mv /tmp/configuration/consul.service /lib/systemd/system/consul.service",
+        "mv /tmp/configuration/nomad.service /lib/systemd/system/nomad.service",
+        "mv /tmp/configuration/config.yml /etc/rexray/config.yml",
+        "mv /tmp/configuration/goss.yml /etc/goss/goss.yml",
+	"mv /tmp/configuration/rsyslog /etc/logrotate.d/rsyslog",
+	"chown -R root:root /etc/logrotate.d/rsyslog",
+	"mv /etc/cron.daily/logrotate /etc/cron.hourly/logrotate",
+	"echo 'ENABLED=true' | tee /etc/default/sysstat",
+        "goss --gossfile /etc/goss/goss.yml validate",
+	"systemctl daemon-reload",
+	"systemctl enable rexray",
+        "sudo systemctl reboot"
+      ]
+    },
+    {
+      "type": "shell",
+      "pause_before": "1m",
+      "inline": [
+        "echo Reboot successful!"
+      ]
+    }
+  ]
+}
+
