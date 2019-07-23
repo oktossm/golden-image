@@ -18,6 +18,26 @@ steps:
   commands:
   - packer build -force -only=gce golden-image.json
 
+---
+kind: pipeline
+name: google-cloud-wellness
+
+steps:
+- name: check for accidentally dropped creds
+  image: yellowmegaman/container-trufflehog:2.0.98
+  commands:
+  - /usr/local/bin/trufflehog --regex --entropy=False file:///$CI_WORKSPACE
+
+- name: build-gce-image
+  image: yellowmegaman/container-packer:1.3.3
+  environment:
+    GOOGLE_PROJECT:
+      from_secret: google_project_wellness
+    GOOGLE_CREDENTIALS:
+      from_secret: google_credentials_wellness
+  commands:
+  - packer build -force -only=gce golden-image-wellness.json
+
 #---
 #kind: pipeline
 #name: aws
