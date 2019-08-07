@@ -20,7 +20,7 @@
 #
 #node:
 #  memory: low
-
+#
 ---
 kind: pipeline
 name: google-cloud-wellness
