@@ -24,7 +24,6 @@ node:
 #---
 #kind: pipeline
 #name: aws
-#
 #steps:
 #- name: check for accidentally dropped creds
 #  image: yellowmegaman/container-trufflehog:2.0.98
