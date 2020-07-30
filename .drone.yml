@@ -12,7 +12,7 @@ steps:
 - name: check for accidentally dropped creds
   image: yellowmegaman/container-trufflehog:2.0.98
   commands:
-  - /usr/local/bin/trufflehog --regex --entropy=False file:///$CI_WORKSPACE
+  - /usr/local/bin/trufflehog --regex --entropy=False file:///$DRONE_WORKSPACE
 
 - name: build-gce-image
   image: yellowmegaman/container-packer:1.3.3
