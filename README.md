@@ -19,6 +19,7 @@ Usage:
 packer build -force -only=gce,aws,do golden-image.json
 ```
 
+
 Configuration above will:
 - create 3 images, one per specified above cloud
 - output image names (ami id)
