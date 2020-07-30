@@ -3,6 +3,12 @@ kind: pipeline
 name: google-cloud-wellness
 
 steps:
+- name: the-more-you-know
+  image: consul:1.5.3
+  commands:
+  - echo -e "$DRONE_RUNNER_HOSTNAME \n"
+  - env | sort
+
 - name: check for accidentally dropped creds
   image: yellowmegaman/container-trufflehog:2.0.98
   commands:
